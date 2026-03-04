@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Ateliê da Preta | Dashboard</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,500&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary: #6B7F5E; /* Verde musgo */
+      --primary-light: #839b73;
+      --secondary: #C9A84C; /* Dourado suave */
+      --secondary-light: #e0ca86;
+      --bg: #FDFBF7; /* Off-white aconchegante */
+      --text: #4A4A4A;
+      --text-light: #7a7a7a;
+      --white: #FFFFFF;
+      --card-bg: #FFFFFF;
+      --danger: #E57373;
+      
+      --status-recebido-bg: #FFF3E0;
+      --status-recebido-text: #E65100;
+      --status-recebido-border: #FFB74D;
+      
+      --status-producao-bg: #E3F2FD;
+      --status-producao-text: #1565C0;
+      --status-producao-border: #64B5F6;
+      
+      --status-pronto-bg: #E8F5E9;
+      --status-pronto-text: #2E7D32;
+      --status-pronto-border: #81C784;
+      
+      --status-entregue-bg: #F5F5F5;
+      --status-entregue-text: #757575;
+      --status-entregue-border: #E0E0E0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent;}
+    
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding-bottom: 80px;
+    }
+    
+    h1, h2, h3, .brand-font {
+      font-family: 'Playfair Display', serif;
+    }
+
+    /* Header */
+    .header {
+      background-color: var(--white);
+      color: var(--primary);
+      padding: 18px 20px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(107, 127, 94, 0.08);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 2px solid var(--secondary);
+    }
+    .header h1 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+    }
+    .header p {
+      font-size: 0.75rem;
+      color: var(--secondary);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    /* Tabs Content */
+    .tab-content { display: none; animation: fadeIn 0.4s ease; }
+    .tab-content.active { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-title {
+      font-size: 1.4rem;
+      color: var(--primary);
+      margin-bottom: 16px;
+      font-style: italic;
+    }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: var(--white);
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 15px;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+      z-index: 100;
+      border-top: 1px solid #f0f0f0;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--text-light);
+      font-size: 0.7rem;
+      border: none;
+      background: none;
+      width: 25%;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .nav-item.active {
+      color: var(--primary);
+      font-weight: 600;
+    }
+    .nav-icon {
+      font-size: 1.3rem;
+      margin-bottom: 4px;
+      filter: grayscale(100%) opacity(0.6);
+      transition: all 0.2s;
+    }
+    .nav-item.active .nav-icon {
+      filter: grayscale(0%) opacity(1);
+      transform: scale(1.1);
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 12px rgba(107, 127, 94, 0.05);
+      border: 1px solid rgba(107, 127, 94, 0.1);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .card-title {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-weight: 500;
+    }
+    .card-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary);
+      font-family: 'Playfair Display', serif;
+    }
+
+    .alert-card {
+      background: #FFF9F0;
+      border-left: 4px solid var(--secondary);
+      border-color: var(--secondary);
+    }
+    .alert-card .card-value { color: #b8860b; font-size: 1.4rem; }
+    .alert-item {
+      font-size: 0.85rem;
+      padding: 8px 0;
+      border-bottom: 1px dashed #eedba4;
+      display: flex;
+      justify-content: space-between;
+    }
+    .alert-item:last-child { border: none; padding-bottom: 0; }
+    
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .grid-2 .card { padding: 16px; margin-bottom: 0; }
+    .grid-2 .card-value { font-size: 1.3rem; }
+
+    /* Orders List */
+    .search-container {
+      position: sticky;
+      top: 68px; /* below header */
+      background-color: var(--bg);
+      padding: 10px 0;
+      z-index: 5;
+    }
+    .search-input {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 20px;
+      border: 1px solid #e0e0e0;
+      font-size: 0.95rem;
+      background: var(--white);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .order-item {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+      border-top: 5px solid var(--status-recebido-border);
+      position: relative;
+    }
+    .order-status-recebido { border-color: var(--status-recebido-border); }
+    .order-status-producao { border-color: var(--status-producao-border); }
+    .order-status-pronto { border-color: var(--status-pronto-border); }
+    .order-status-entregue { border-color: var(--status-entregue-border); opacity: 0.7; }
+
+    .order-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+    .order-client {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: var(--primary);
+    }
+    .order-value {
+      font-weight: 600;
+      color: var(--secondary);
+      font-size: 1.05rem;
+    }
+    .order-product {
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: #333;
+      margin-bottom: 4px;
+    }
+    .order-desc {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 5px;
+    }
+    .order-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid #f0f0f0;
+    }
+    .order-date {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .status-badge {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.1s;
+    }
+    .status-badge:active { transform: scale(0.95); }
+    
+    .bg-recebido { background: var(--status-recebido-bg); color: var(--status-recebido-text); }
+    .bg-producao { background: var(--status-producao-bg); color: var(--status-producao-text); }
+    .bg-pronto { background: var(--status-pronto-bg); color: var(--status-pronto-text); }
+    .bg-entregue { background: var(--status-entregue-bg); color: var(--status-entregue-text); }
+
+    .fab {
+      position: fixed;
+      bottom: 85px;
+      right: 20px;
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      font-size: 28px;
+      font-weight: 300;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      box-shadow: 0 4px 15px rgba(107, 127, 94, 0.4);
+      cursor: pointer;
+      z-index: 90;
+      transition: transform 0.2s;
+    }
+    .fab:active { transform: scale(0.9); }
+
+    /* Form */
+    .form-group { margin-bottom: 18px; }
+    .form-label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      font-size: 0.85rem;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .form-control {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      background: var(--white);
+      font-family: inherit;
+      font-size: 1rem;
+      color: var(--text);
+      transition: all 0.2s;
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.1);
+    }
+    textarea.form-control { resize: vertical; min-height: 80px; }
+    
+    .btn-submit {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(107, 127, 94, 0.2);
+    }
+    .btn-submit:active { transform: translateY(2px); box-shadow: none; }
+
+    /* Chart */
+    .chart-container {
+      display: flex;
+      align-items: flex-end;
+      height: 180px;
+      gap: 15px;
+      margin-top: 20px;
+      padding: 20px 10px 0;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    .bar-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+      justify-content: flex-end;
+    }
+    .bar-value {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 4px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .bar {
+      width: 100%;
+      background: linear-gradient(to top, var(--primary), var(--secondary));
+      border-radius: 6px 6px 0 0;
+      min-height: 5px;
+      transition: height 1s cubic-bezier(0.1, 0.8, 0.2, 1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .bar-label {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      margin-top: 12px;
+      font-weight: 500;
+    }
+    .chart-container:hover .bar-value { opacity: 1; }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-light);
+    }
+    .empty-icon { font-size: 3rem; margin-bottom: 10px; opacity: 0.5; }
+    
+    .recent-list { margin-top: 20px; }
+    .recent-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .recent-item:last-child { border-bottom: none; }
+    .recent-info { display: flex; flex-direction: column; }
+    .recent-name { font-weight: 500; font-size: 0.95rem; }
+    .recent-date { font-size: 0.75rem; color: var(--text-light); }
+    .recent-val { font-weight: 600; color: var(--primary); }
+
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <h1>Ateliê da Preta</h1>
+    <p>Confeitaria Artesanal</p>
+  </header>
+
+  <main class="container">
+    
+    <!-- ABA 1: HOJE -->
+    <section id="tab-hoje" class="tab-content active">
+      <h2 class="section-title">Resumo do Dia</h2>
+      
+      <div class="card alert-card" id="hoje-alertas-container" style="display: none;">
+        <div class="card-header">
+          <span class="card-title">⚠️ Atenção: Prazo curto (< 24h)</span>
+        </div>
+        <div id="hoje-alertas-list"></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Para Hoje</div>
+          <div class="card-value" id="hoje-qtd">0</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Para Amanhã</div>
+          <div class="card-value" id="amanha-qtd">0</div>
+        </div>
+      </div>
+
+      <div class="card mt-3" style="margin-top: 16px;">
+        <div class="card-title">Faturamento Mês Atual</div>
+        <div class="card-value" id="hoje-faturamento">R$ 0,00</div>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">Ticket Médio (Mês)</div>
+        <div class="card-value" id="hoje-ticket">R$ 0,00</div>
+      </div>
+    </section>
+
+    <!-- ABA 2: PEDIDOS -->
+    <section id="tab-pedidos" class="tab-content">
+      <div class="search-container">
+        <input type="text" id="busca-pedido" class="search-input" placeholder="🔍 Buscar por cliente ou data..." oninput="renderPedidos()">
+      </div>
+      
+      <div id="pedidos-list" style="margin-top: 15px;">
+        <!-- Orders will be injected here -->
+      </div>
+      
+      <button class="fab" onclick="switchTab('tab-novo')">+</button>
+    </section>
+
+    <!-- ABA 3: NOVO PEDIDO -->
+    <section id="tab-novo" class="tab-content">
+      <h2 class="section-title">Novo Pedido</h2>
+      
+      <form id="form-pedido" class="card" onsubmit="salvarPedido(event)">
+        
+        <div class="form-group">
+          <label class="form-label">Nome do Cliente</label>
+          <input type="text" id="np-nome" class="form-control" placeholder="Ex: Maria Silva" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">WhatsApp</label>
+          <input type="tel" id="np-whatsapp" class="form-control" placeholder="(62) 99999-9999" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Produto</label>
+          <select id="np-produto" class="form-control" required>
+            <option value="" disabled selected>Selecione uma opção</option>
+            <option value="Bolo Chantininho">🎂 Bolo Chantininho</option>
+            <option value="Torta">🥧 Torta</option>
+            <option value="Brigadeiro">🍫 Brigadeiro</option>
+            <option value="Outro">✨ Outro</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Descrição / Personalização</label>
+          <textarea id="np-desc" class="form-control" placeholder="Recheio, cores, tema, topo de bolo..." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Data e Hora de Entrega</label>
+          <input type="datetime-local" id="np-data" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Valor Combinado (R$)</label>
+          <input type="number" step="0.01" id="np-valor" class="form-control" placeholder="0.00" required>
+        </div>
+
+        <button type="submit" class="btn-submit">Salvar Pedido</button>
+      </form>
+    </section>
+
+    <!-- ABA 4: FINANCEIRO -->
+    <section id="tab-financeiro" class="tab-content">
+      <h2 class="section-title">Financeiro</h2>
+      
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Recebido (Mês)</div>
+          <div class="card-value" style="font-size: 1.4rem;" id="fin-recebido">R$ 0,00</div>
+        </div>
+        <div class="card">
+          <div class="card-title">A Receber</div>
+          <div class="card-value" style="font-size: 1.4rem; color: var(--secondary);" id="fin-areceber">R$ 0,00</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top: 16px;">
+        <div class="card-header">
+          <div class="card-title">Faturamento por Semana (Mês Atual)</div>
+        </div>
+        <div class="chart-container" id="fin-grafico">
+           <!-- Chart injected here -->
+        </div>
+      </div>
+
+      <div class="card recent-list">
+        <div class="card-title mb-2">Últimos Pedidos</div>
+        <div id="fin-recentes">
+          <!-- Recent injected here -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" onclick="switchTab('tab-hoje')">
+      <span class="nav-icon">📅</span>
+      <span>Hoje</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('tab-pedidos')">
+      <span class="nav-icon">📋</span>
+      <span>Pedidos</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('tab-novo')">
+      <span class="nav-icon">✨</span>
+      <span>Novo</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('tab-financeiro')">
+      <span class="nav-icon">💰</span>
+      <span>Financeiro</span>
+    </button>
+  </nav>
+
+  <script>
+    // --- Data Management ---
+    const STORAGE_KEY = 'atelie_preta_orders';
+    const STATUS_FLOW = ['recebido', 'producao', 'pronto', 'entregue'];
+    const STATUS_INFO = {
+      'recebido': { label: '🟡 Recebido', class: 'bg-recebido', border: 'order-status-recebido' },
+      'producao': { label: '🔵 Em produção', class: 'bg-producao', border: 'order-status-producao' },
+      'pronto':   { label: '🟢 Pronto', class: 'bg-pronto', border: 'order-status-pronto' },
+      'entregue': { label: '✅ Entregue', class: 'bg-entregue', border: 'order-status-entregue' }
+    };
+
+    let orders = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+    // Pre-populate if empty
+    if (orders.length === 0) {
+      const now = new Date();
+      
+      const d1 = new Date(now.getTime() + 4 * 60 * 60 * 1000); // Today, in 4 hours
+      const d2 = new Date(now.getTime() + 26 * 60 * 60 * 1000); // Tomorrow
+      const d3 = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000); // 2 days ago
+      
+      const pad = n => n.toString().padStart(2, '0');
+      const isoFormat = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+      orders = [
+        {
+          id: Date.now().toString() + '1',
+          client: "Ana Clara Souza",
+          whatsapp: "62988887777",
+          product: "Bolo Chantininho",
+          description: "Massa branca, recheio de ninho com morango. Tema floral rosa e dourado.",
+          date: isoFormat(d1),
+          value: 220.00,
+          status: "producao"
+        },
+        {
+          id: Date.now().toString() + '2',
+          client: "Juliana Mendes",
+          whatsapp: "62999995555",
+          product: "Torta",
+          description: "Torta de limão com merengue suíço (grande).",
+          date: isoFormat(d2),
+          value: 110.00,
+          status: "recebido"
+        },
+        {
+          id: Date.now().toString() + '3',
+          client: "Roberto Carlos",
+          whatsapp: "62977773333",
+          product: "Brigadeiro",
+          description: "Caixa com 50 doces tradicionais e 50 surpresas de uva.",
+          date: isoFormat(d3),
+          value: 150.00,
+          status: "entregue"
+        }
+      ];
+      saveOrders();
+    }
+
+    function saveOrders() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
+    }
+
+    // --- Format Helpers ---
+    const formatMoney = val => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
+    const formatDate = dString => {
+      const d = new Date(dString);
+      return d.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' }) + ' às ' + 
+             d.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+    };
+    
+    // --- Navigation ---
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      
+      document.getElementById(tabId).classList.add('active');
+      const navBtn = document.querySelector(`.nav-item[onclick="switchTab('${tabId}')"]`);
+      if(navBtn) navBtn.classList.add('active');
+      
+      if(tabId === 'tab-hoje') renderHoje();
+      if(tabId === 'tab-pedidos') renderPedidos();
+      if(tabId === 'tab-financeiro') renderFinanceiro();
+      
+      window.scrollTo(0,0);
+    }
+
+    // --- Aba 1: HOJE ---
+    function renderHoje() {
+      const now = new Date();
+      const pad = n => n.toString().padStart(2, '0');
+      
+      const strHoje = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+      
+      const amanhaDate = new Date(now.getTime() + 86400000);
+      const strAmanha = `${amanhaDate.getFullYear()}-${pad(amanhaDate.getMonth()+1)}-${pad(amanhaDate.getDate())}`;
+      
+      const strMes = `${now.getFullYear()}-${pad(now.getMonth()+1)}`;
+
+      let countHoje = 0;
+      let countAmanha = 0;
+      let alertas = [];
+      let faturamentoMes = 0;
+      let ticketSoma = 0;
+      let ticketQtd = 0;
+
+      orders.forEach(o => {
+        // Contagens
+        if(o.date.startsWith(strHoje)) countHoje++;
+        if(o.date.startsWith(strAmanha)) countAmanha++;
+        
+        // Alertas < 24h (se não estiver entregue)
+        if(o.status !== 'entregue') {
+          const oDate = new Date(o.date);
+          const diffMs = oDate - now;
+          if(diffMs > 0 && diffMs < 86400000) {
+            const horasFormat = Math.floor(diffMs / 3600000);
+            alertas.push({...o, horasLeft: horasFormat});
+          }
+        }
+
+        // Faturamento Mes Atual (Considerando todos os criados/entregados nesse mês)
+        // Para confeitaria, vamos considerar o valor de todos os pedidos agendados para este mês
+        if(o.date.startsWith(strMes)) {
+          faturamentoMes += parseFloat(o.value);
+          ticketSoma += parseFloat(o.value);
+          ticketQtd++;
+        }
+      });
+
+      document.getElementById('hoje-qtd').textContent = countHoje;
+      document.getElementById('amanha-qtd').textContent = countAmanha;
+      
+      document.getElementById('hoje-faturamento').textContent = formatMoney(faturamentoMes);
+      document.getElementById('hoje-ticket').textContent = ticketQtd > 0 ? formatMoney(ticketSoma / ticketQtd) : 'R$ 0,00';
+
+      // Render Alertas
+      const alertContainer = document.getElementById('hoje-alertas-container');
+      const alertList = document.getElementById('hoje-alertas-list');
+      
+      if(alertas.length > 0) {
+        alertContainer.style.display = 'block';
+        alertList.innerHTML = alertas.sort((a,b)=>new Date(a.date)-new Date(b.date)).map(a => `
+          <div class="alert-item">
+            <span><strong>${a.client}</strong> - ${a.product}</span>
+            <span style="color:var(--danger); font-weight:600;">em ${a.horasLeft}h</span>
+          </div>
+        `).join('');
+      } else {
+        alertContainer.style.display = 'none';
+      }
+    }
+
+    // --- Aba 2: PEDIDOS ---
+    function renderPedidos() {
+      const list = document.getElementById('pedidos-list');
+      const search = document.getElementById('busca-pedido').value.toLowerCase();
+      
+      // Sort: nearest first, then others.
+      let sorted = [...orders].sort((a,b) => new Date(a.date) - new Date(b.date));
+      
+      if(search) {
+        sorted = sorted.filter(o => 
+          o.client.toLowerCase().includes(search) || 
+          o.product.toLowerCase().includes(search) ||
+          formatDate(o.date).includes(search)
+        );
+      }
+
+      if(sorted.length === 0) {
+        list.innerHTML = `<div class="empty-state"><div class="empty-icon">🍰</div>Nenhum pedido encontrado.</div>`;
+        return;
+      }
+
+      list.innerHTML = sorted.map(o => {
+        const info = STATUS_INFO[o.status];
+        return `
+          <div class="order-item ${info.border}">
+            <div class="order-header-row">
+              <div class="order-client">${o.client}</div>
+              <div class="order-value">${formatMoney(o.value)}</div>
+            </div>
+            <div class="order-product">${o.product}</div>
+            <div class="order-desc">
+               <span>📝</span> <span>${o.description}</span>
+            </div>
+            <div class="order-footer">
+              <div class="order-date">⏳ ${formatDate(o.date)}</div>
+              <button class="status-badge ${info.class}" onclick="advanceStatus('${o.id}')">
+                ${info.label}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function advanceStatus(id) {
+      const order = orders.find(x => x.id === id);
+      const currentIndex = STATUS_FLOW.indexOf(order.status);
+      
+      if(currentIndex < STATUS_FLOW.length - 1) {
+        order.status = STATUS_FLOW[currentIndex + 1];
+      } else {
+        // Optional: loop back to top or just do nothing
+        // order.status = STATUS_FLOW[0]; 
+      }
+      saveOrders();
+      renderPedidos(); 
+    }
+
+    // --- Aba 3: NOVO PEDIDO ---
+    function salvarPedido(e) {
+      e.preventDefault();
+      
+      const novo = {
+        id: Date.now().toString(),
+        client: document.getElementById('np-nome').value,
+        whatsapp: document.getElementById('np-whatsapp').value,
+        product: document.getElementById('np-produto').value,
+        description: document.getElementById('np-desc').value,
+        date: document.getElementById('np-data').value,
+        value: parseFloat(document.getElementById('np-valor').value),
+        status: 'recebido'
+      };
+
+      orders.push(novo);
+      saveOrders();
+      
+      // Reset form
+      e.target.reset();
+      
+      // Go to pedidos
+      switchTab('tab-pedidos');
+    }
+
+    // --- Aba 4: FINANCEIRO ---
+    function renderFinanceiro() {
+      const now = new Date();
+      const pad = n => n.toString().padStart(2, '0');
+      const strMes = `${now.getFullYear()}-${pad(now.getMonth()+1)}`;
+
+      let recebidoMes = 0;
+      let aReceber = 0;
+      
+      // Agrupar faturamento por semana (1 a 4) - simplificado
+      const semanas = [0, 0, 0, 0];
+
+      orders.forEach(o => {
+        if(o.date.startsWith(strMes)) {
+          const val = parseFloat(o.value);
+          if(o.status === 'entregue') {
+            recebidoMes += val;
+          } else {
+            aReceber += val;
+          }
+
+          // Descobrir a semana (aprox: 1-7, 8-14, 15-21, 22+)
+          const dia = new Date(o.date).getDate();
+          let semIdx = 0;
+          if(dia > 7 && dia <= 14) semIdx = 1;
+          else if(dia > 14 && dia <= 21) semIdx = 2;
+          else if(dia > 21) semIdx = 3;
+          
+          semanas[semIdx] += val;
+        }
+      });
+
+      document.getElementById('fin-recebido').textContent = formatMoney(recebidoMes);
+      document.getElementById('fin-areceber').textContent = formatMoney(aReceber);
+
+      // Render chart
+      const chartContainer = document.getElementById('fin-grafico');
+      const maxVal = Math.max(...semanas) || 1; // avoid div/0
+      
+      chartContainer.innerHTML = semanas.map((val, idx) => {
+        const heightPct = (val / maxVal) * 100;
+        return `
+          <div class="bar-wrapper">
+             <div class="bar-value">${formatMoney(val)}</div>
+             <div class="bar" style="height: ${Math.max(heightPct, 3)}%;"></div>
+             <div class="bar-label">Sem ${idx + 1}</div>
+          </div>
+        `;
+      }).join('');
+
+      // Render Last 5
+      const recentesList = document.getElementById('fin-recentes');
+      const recentes = [...orders].filter(o => o.status === 'entregue').sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+      
+      if(recentes.length === 0) {
+        recentesList.innerHTML = `<div style="font-size:0.85rem; color:#999; text-align:center; padding: 20px 0;">Nenhum pedido entregue ainda.</div>`;
+      } else {
+        recentesList.innerHTML = recentes.map(o => `
+          <div class="recent-item">
+            <div class="recent-info">
+              <span class="recent-name">${o.client}</span>
+              <span class="recent-date">${formatDate(o.date)}</span>
+            </div>
+            <span class="recent-val">${formatMoney(o.value)}</span>
+          </div>
+        `).join('');
+      }
+    }
+
+    // Init
+    document.addEventListener('DOMContentLoaded', () => {
+      renderHoje();
+    });
+
+  </script>
+</body>
+</html>
